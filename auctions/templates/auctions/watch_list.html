@@ -1,0 +1,32 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    Watch List
+{% endblock %}
+
+{% block body %}
+    <h2>Watch List</h2>
+
+
+    {% if not listings %}
+        <h4>No listings</h4>
+    {% endif %}
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between">
+            {% for listing in listings %}
+                <div class="listing-item" style="font-size: 13px; margin: 10px; padding: 10px; width: 31.5%;">
+                    <img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="100%" height="auto">
+                    <h4>{{ listing.title }}</h4>
+                    <p>{{ listing.description }}</p>
+                    <p >Price: ${{ listing.current_bid }}</p>
+                    <p>Seller: {{ listing.owner }}</p>
+                    <form action="{% url 'listing' %}">
+                        <input type="submit" value="View Listing">
+                        <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                    </form> 
+                </div>
+            {% endfor %}
+        </div>
+      </div>
+    
+{% endblock %}
