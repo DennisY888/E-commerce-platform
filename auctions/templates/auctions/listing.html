@@ -1,0 +1,170 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    {{ listing.title }}
+{% endblock %}
+
+{% block body %}
+
+    {% if comment_message %}
+        <div class="alert alert-danger" role="alert">
+            {{ comment_message }}
+        </div>
+    {% endif %}
+
+    {% if bid_empty %}
+        <div class="alert alert-danger" role="alert">
+            {{ bid_empty }}
+        </div>
+    {% endif %}
+    
+    {% if bid_not_number %}
+        <div class="alert alert-danger" role="alert">
+            {{ bid_not_number }}
+        </div>
+    {% endif %}
+
+    {% if other_win_message %}
+        <div class="alert alert-success" role="alert">
+            {{ other_win_message }}
+        </div>
+    {% endif %}
+
+
+    {% if winner_win_message %}
+        <div class="alert alert-success" role="alert">
+            {{ winner_win_message }}
+        </div>
+    {% endif %}
+
+
+
+
+    {% if is_bid_success == True %}
+        <div class="alert alert-success" role="alert">
+            Successful bid
+        </div>
+
+    {% elif is_bid_success == False %}
+
+        {% if is_first == True %}
+            <div class="alert alert-danger" role="alert">
+                Bid cannot be less than starting price
+            </div>
+        {% elif is_first == False %}
+            <div class="alert alert-danger" role="alert">
+                Bid cannot be less than or equal to current bid
+            </div>
+        {% endif %}
+
+    {% endif %}
+
+
+
+
+
+
+    <h3>{{ listing.title }}</h3>
+    
+    <!--watch list button-->
+    {% if not is_watch %}
+        <form action="{% url 'add_watch' %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Watch">
+            <input type="hidden" name="listing_id" value="{{ listing.id }}">
+        </form>
+    {% else %}
+        <form action="{% url 'remove_watch' %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Unwatch">
+            <input type="hidden" name="listing_id" value="{{ listing.id }}">
+        </form>
+    {% endif %}
+
+
+
+    <img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="350" height="auto">
+    <p >Current Price: ${{ listing.current_bid }} | Bids: {{ num_bids }}</p>
+
+
+    {% if request.user.is_authenticated and listing.is_active == 1 %}
+        {% if request.user.id == listing.owner.id %}
+            <form action="{% url 'close_auction' %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Close Auction">
+                <input type="hidden" name="listing_id" value="{{ listing.id }}">
+            </form>
+        {% else %}
+            <form action="{% url 'add_bid' %}" method="post">
+                {% csrf_token %}
+                <input type="number" name="bid" class="form-control" placeholder="Enter bid" step="0.01" min="0.00" max="9999999.99" required>
+                <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                <input type="submit" value="Place Bid">
+            </form>
+        {% endif %}
+    {% elif listing.is_active == 1 %}
+        <form action="{% url 'add_bid' %}" method="post">
+            {% csrf_token %}
+            <input type="number" name="bid" class="form-control" placeholder="Enter bid" step="0.01" min="0.00" max="9999999.99" required>
+            <input type="hidden" name="listing_id" value="{{ listing.id }}">
+            <input type="submit" value="Place Bid">
+        </form>   
+    {% endif %}
+
+
+    <p></p>
+
+
+
+    <h4>Categories:</h4>
+    <div style="border: 1px solid rgb(185, 184, 184); padding: 10px;">
+        {% for category in categories %}
+            <div>{{ category.name }}</div>
+        {% empty %}
+            <div>None</div>
+        {% endfor %}
+    </div>
+
+    <p></p>
+
+    <h4>Description:</h4>
+    <p>{{ listing.description }}</p>
+    <p>Listing created by <strong>{{ listing.owner.username }}</strong> on {{ listing.datetime }}</p>
+
+
+
+    <div class="container mt-5">
+        <h3>Comments</h3>
+        <div class="comments-container">
+            {% for comment in comments %}
+                <div class="comment">
+                    <p>{{ comment.datetime }} | <strong>{{ comment.user.username }}</strong>: {{ comment.comment }}</p>
+                </div>
+            {% empty %}
+                <p>No comments yet...</p>
+            {% endfor %}
+        </div>
+    </div>
+
+
+
+      <!--add comment-->
+    <form action="{% url 'add_comment' %}" method="post">
+        {% csrf_token %}
+        <textarea name="comment" rows="4" cols="50" placeholder="Enter your comment here..."></textarea>
+        <input type="hidden" name="listing_id" value="{{ listing.id }}">
+        <input type="submit" value="Post">
+    </form>
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
