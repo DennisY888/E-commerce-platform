@@ -4,3 +4,4 @@
 ### Purpose
 - practice extensive relation model design (one-to-one, one-to-many, many-to-many)
 - practice traditional Django function-based Server Side Rending with HTML
+- practice Django ORM database manipulation techniques
